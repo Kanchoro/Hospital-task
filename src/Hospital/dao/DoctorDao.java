@@ -5,11 +5,11 @@ import Hospital.models.Doctor;
 import java.util.List;
 
 public interface DoctorDao {
-    Doctor findDoctorById(int index, int index2);
+    Doctor findDoctorById(Long id);
 
-    String assignDoctorToDepartment(Long id, List<Doctor> doctorsId);
+    String assignDoctorToDepartment(Long departmentId, List<Doctor> doctorsId);
 
-    List<Doctor> getAllDoctorsByHospitalId(int index);
+    List<Doctor> getAllDoctorsByHospitalId(Long id);
 
-    List<Doctor> getAllDoctorsByDepartmentId(int index,int index2);
+    List<Doctor> getAllDoctorsByDepartmentId(Long id);
 }

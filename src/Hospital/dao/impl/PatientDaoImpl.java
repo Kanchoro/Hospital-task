@@ -6,74 +6,112 @@ import Hospital.db.DataBase;
 import Hospital.models.Hospital;
 import Hospital.models.Patient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class PatientDaoImpl implements PatientDao , GenericService<Patient> {
+public class PatientDaoImpl implements PatientDao, GenericService<Patient> {
     @Override
-    public String add(int index, Patient patient) {
-        DataBase.hospitals.get(index).getPatients().add(patient);
-        return "successfully added";
+    public String addPatientsToHospital(Long id, List<Patient> patients) {
+        boolean isTrue = DataBase.hospitals.stream()
+                .filter(hospital -> hospital.getId().equals(id))
+                .findFirst()
+                .map(hospital -> hospital.getPatients().addAll(patients))
+                .orElse(false);
+
+        if(isTrue){
+            return "successfully added";
+        }
+        return "Hospital with this id not found";
     }
 
     @Override
-    public void removeById(int index,int hosIndex) {
-        DataBase.hospitals.get(hosIndex).getPatients().remove(index);
-        System.out.println("successfully deleted");
+    public Patient getPatientById(Long id) {
+        return DataBase.hospitals.stream()
+                .flatMap(hospital -> hospital.getPatients().stream()
+                        .filter(patient -> patient.getId().equals(id))
+                        .map(patient -> hospital.getPatients().get(hospital.getPatients().indexOf(patient))))
+                .findFirst()
+                .orElse(null);
+
     }
 
     @Override
-    public String updateById(int index,int index2, Patient patient) {
-        DataBase.hospitals.get(index).getPatients().set(index2,patient);
-        return "successfully deleted";
-    }
+    public Map<Integer, List<Patient>> getPatientByAge() {
+        Map<Integer, List<Patient>> patientsByAge = new HashMap<>();
 
-    @Override
-    public String addPatientsToHospital(int index, List<Patient> patients) {
-        DataBase.hospitals.get(index).getPatients().addAll(patients);
-        return "successfully added to hospital ";
-    }
+        List<Patient> patients = DataBase.hospitals.stream()
+                .flatMap(hospital -> hospital.getPatients().stream())
+                .sorted(Comparator.comparingInt(Patient::getAge))
+                .collect(Collectors.toList());
 
-    @Override
-    public Patient getPatientById(int index,int indexP) {
-        return DataBase.hospitals.get(index).getPatients().get(indexP);
-    }
-
-    @Override
-    public Map<Integer,List<Patient> > getPatientByAge() {
-
-        Map<Integer,List<Patient>> patiensByAge = new HashMap<>();
-        List<Patient> patients = new ArrayList<>();
-        for(Hospital hospital : DataBase.hospitals){
-            patients.addAll(hospital.getPatients());
+        if (!patients.isEmpty()) {
+            patientsByAge.put(1, patients);
         }
 
-        if(!patients.isEmpty()){
-            patients.sort((o1,o2) -> Integer.valueOf(o1.getAge()).compareTo(o2.getAge()));
-            patiensByAge.put(1,patients);
-        }
-
-        return patiensByAge;
+        return patientsByAge;
     }
 
     @Override
     public List<Patient> sortPatientsByAge(String ascOrDesc) {
-        List<Patient> patients = new ArrayList<>();
-        if(ascOrDesc.equalsIgnoreCase("A")){
-            for(Hospital hospital : DataBase.hospitals){
-                patients.addAll(hospital.getPatients());
-            }
-            patients.sort((o1,o2) -> Integer.valueOf(o1.getAge()).compareTo(o2.getAge()));
-        }else if(ascOrDesc.equalsIgnoreCase("D")){
-            for(Hospital hospital : DataBase.hospitals){
-                patients.addAll(hospital.getPatients());
-            }
-            patients.sort((o1,o2) -> Integer.compare(o2.getAge(), o1.getAge()));
-        }else{
-            System.out.println("Patient with this id not found");
+        List<Patient> patients = DataBase.hospitals.stream()
+                .flatMap(hospital -> hospital.getPatients().stream())
+                .collect(Collectors.toList());
+
+        if (ascOrDesc.equalsIgnoreCase("A")) {
+            patients.sort(Comparator.comparingInt(Patient::getAge));
+        } else if (ascOrDesc.equalsIgnoreCase("D")) {
+            patients.sort(Comparator.comparingInt(Patient::getAge).reversed());
+        } else {
+            System.out.println("Invalid sorting order");
         }
+
         return patients;
+    }
+
+    @Override
+    public String add(Long hospitalId, Patient patient) {
+        return DataBase.hospitals.stream()
+                .filter(hospital -> hospital.getId().equals(hospitalId))
+                .findFirst()
+                .map(hospital -> {hospital.getPatients().add(patient);
+                    return "successfully added";})
+                .orElse("Hospital with this id not found");
+
+    }
+
+    @Override
+    public void removeById(Long id) {
+        try{
+            boolean Deleted = DataBase.hospitals.stream()
+                    .flatMap(hospital -> hospital.getPatients().stream()
+                            .filter(patient -> patient.getId().equals(id))
+                            .map(patient -> {
+                                hospital.getPatients().remove(patient);
+                                System.out.println("successfully deleted");
+                                return true;
+                            }))
+                    .findFirst()
+                    .orElse(false);
+            if (!Deleted) {
+                System.out.println("Patient with this id not found");
+            }
+        }catch (Exception e){
+            System.out.println(" ");
+        }
+
+
+    }
+
+    @Override
+    public String updateById(Long id, Patient patient) {
+        return DataBase.hospitals.stream()
+                .flatMap(hospital -> hospital.getPatients().stream()
+                        .filter(patient1 -> patient1.getId().equals(id))
+                        .map(patient1 -> {
+                            hospital.getPatients().set(hospital.getPatients().indexOf(patient1),patient);
+                            return "successfully updated";
+                        }))
+                .findFirst()
+                .orElse("Patient with this id not found");
     }
 }

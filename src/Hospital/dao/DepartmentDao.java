@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DepartmentDao {
 
-    List<Department> getAllDepartmentByHospital(int index);
+    List<Department> getAllDepartmentByHospital(Long id);
 
-    Department findDepartmentByName(int index , int index2);
+    Department findDepartmentByName(String name);
 }

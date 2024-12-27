@@ -10,13 +10,13 @@ public interface HospitalDao {
 
     String addHospital(Hospital hospital);
 
-    Hospital findHospitalById(int index);
+    Hospital findHospitalById(Long id);
 
     List<Hospital> getAllHospital();
 
-    List<Patient> getAllPatientFromHospital(int index);
+    List<Patient> getAllPatientFromHospital(Long id);
 
-    String deleteHospitalById(int index);
+    String deleteHospitalById(Long id);
 
     Map<Integer,Hospital> getAllHospitalByAddress(String address);
 }

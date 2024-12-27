@@ -17,66 +17,30 @@ public class PatientServiceImpl implements PatientService , GenericService<Patie
         this.patientDaoImp = patientDaoImp;
     }
 
+
     @Override
     public String add(Long hospitalId, Patient patient) {
-        for(Hospital hospital : DataBase.hospitals){
-            if(hospital.getId().equals(hospitalId)){
-                return patientDaoImp.add(DataBase.hospitals.indexOf(hospital),patient);
-            }
-        }
-        return "Hospital with this id not found";
+        return patientDaoImp.add(hospitalId,patient);
     }
 
     @Override
     public void removeById(Long id) {
-        boolean isTrue = true;
-        for(Hospital hospital : DataBase.hospitals){
-            for(Patient patient : hospital.getPatients()){
-                if(patient.getId().equals(id)){
-                    isTrue = false;
-                    patientDaoImp.removeById(hospital.getPatients().indexOf(patient),
-                            DataBase.hospitals.indexOf(hospital));
-                    break;
-                }
-            }
-        }
-        if(isTrue) System.out.println("Patient with this id not found");
+        patientDaoImp.removeById(id);
     }
 
     @Override
     public String updateById(Long id, Patient patient) {
-        for(Hospital hospital : DataBase.hospitals){
-            for(Patient patient2 : hospital.getPatients()){
-                if(patient2.getId().equals(id)){
-                    return patientDaoImp.updateById(DataBase.hospitals.indexOf(hospital),
-                            hospital.getPatients().indexOf(patient2),patient);
-                }
-            }
-        }
-        return "Patient with this id not found";
+        return patientDaoImp.updateById(id,patient) ;
     }
 
     @Override
     public String addPatientsToHospital(Long id, List<Patient> patients) {
-        for(Hospital hospital : DataBase.hospitals){
-            if(hospital.getId().equals(id)){
-                return patientDaoImp.addPatientsToHospital(DataBase.hospitals.indexOf(hospital),patients);
-            }
-        }
-        return "Hospital with this id not found";
+        return patientDaoImp.addPatientsToHospital(id,patients);
     }
 
     @Override
     public Patient getPatientById(Long id) {
-        for(Hospital hospital : DataBase.hospitals){
-            for(Patient patient : hospital.getPatients()){
-                if(patient.getId().equals(id)){
-                    return   patientDaoImp.getPatientById(DataBase.hospitals.indexOf(hospital),
-                            hospital.getPatients().indexOf(patient));
-                }
-            }
-        }
-        return null;
+        return patientDaoImp.getPatientById(id);
     }
 
     @Override

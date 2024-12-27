@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface PatientDao {
-    String addPatientsToHospital(int index, List<Patient> patients);
+    String addPatientsToHospital(Long id, List<Patient> patients);
 
-    Patient getPatientById(int index, int indexP);
+    Patient getPatientById(Long id);
 
-    Map<Integer,List<Patient> > getPatientByAge();
+    Map<Integer, List<Patient>> getPatientByAge();
 
     List<Patient> sortPatientsByAge(String ascOrDesc);
 
